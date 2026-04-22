@@ -31,4 +31,4 @@ These proofs support the SuperBEST routing table documented at
 [monogate.org](https://monogate.org). The F16 family of 16 exp-ln
 binary operators is defined in Odrzywołek (2026), arXiv:2603.21852.
 
-Research by Arturo R. Almaguer.
+Monogate Research.
