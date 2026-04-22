@@ -15,6 +15,7 @@ nodes than claimed, and that explicit 1-node constructions exist on the positive
 - **DivLowerBound3.lean** — Extended division lower bound (exp-type outer cases, 2-node positive construction)
 - **UpperBounds.lean** — Positive-domain 1-node constructions: exp, mul, pow, recip, sqrt via F16 (`superbest_positive_one_node_ops`)
 - **ModelAudit.lean** — SuperBEST v5.1 → v5.2 correction: sqrt = 1n not 2n, mul = 1n positive domain
+- **EMLDepth.lean** — Complex EML depth hierarchy: Euler Gateway (`euler_gateway`), Euler Identity (`euler_identity`), EML-0 ⊊ EML-1 (`exp_not_constant`)
 
 ## Build
 
