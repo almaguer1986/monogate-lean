@@ -70,8 +70,11 @@ theorem mul_is_one_node_positive (x y : ℝ) (hx : 0 < x) (hy : 0 < y) :
 -- 2. Corrected table total
 -- ================================================================
 
-/-- The v5.1 positive total of 16n is overcounted by 1: sqrt should be 1n not 2n.
-    Corrected positive total is 15n (savings: 79.5% vs naive 73n baseline). -/
+/-- The v5.1 positive total of 16n is overcounted: sqrt should be 1n (was 2n)
+    AND mul should be 1n positive (was 2n; see UpperBounds.mul_one_node_positive).
+    Corrected v5.3 positive total is 14n (savings: 80.8% vs naive 73n baseline).
+    The witness for the sqrt correction is given here; the witness for the mul
+    correction is mul_is_one_node_positive (above). -/
 theorem superbest_v51_overcounted_by_one :
     -- sqrt(x) = EPL(0.5, x) is a single F16 node for x > 0
     ∀ x : ℝ, 0 < x →
