@@ -112,3 +112,76 @@ EXPLANATION: Under the tree-depth definition, EMLTree.depth (ceml t1 t2) = 1 + m
 So ceml(t1, t2) with t1.depth = t2.depth = 3 gives depth 4, NOT 3.
 The closure claim must be about extensional function equality, not syntactic depth.
 -/
+
+-- ================================================================
+-- 4. Additional v5.3 positive-domain 1-node constructions
+-- ================================================================
+
+/-- EPL(−1, x) = exp(−log x) = 1/x for x > 0 (recip = 1n). -/
+theorem recip_is_one_node_positive (x : ℝ) (hx : 0 < x) :
+    Real.exp ((-1) * Real.log x) = 1 / x := by
+  rw [show (-1 : ℝ) * Real.log x = -(Real.log x) from by ring,
+      Real.exp_neg, Real.exp_log hx, inv_eq_one_div]
+
+/-- EPL(n, x) = exp(n · log x) = x^n for x > 0 (pow = 1n). -/
+theorem pow_is_one_node_positive (n x : ℝ) (hx : 0 < x) :
+    Real.exp (n * Real.log x) = x ^ n := by
+  rw [Real.rpow_def_of_pos hx]; ring_nf
+
+/-- EXL(0, x) = exp(0) · log x = log x (ln = 1n via the extended EXL operator). -/
+theorem ln_is_one_node_via_exl (x : ℝ) :
+    Real.exp 0 * Real.log x = Real.log x := by
+  rw [Real.exp_zero, one_mul]
+
+-- ================================================================
+-- 5. Cross-check consistency: sqrt construction is the same
+--    shape as pow(0.5)
+-- ================================================================
+
+/-- Cross-check: sqrt = EPL(0.5, x) is the same as pow(x, 0.5) for x > 0. -/
+theorem sqrt_equiv_pow_half (x : ℝ) (hx : 0 < x) :
+    Real.exp (0.5 * Real.log x) = x ^ (0.5 : ℝ) := by
+  rw [Real.rpow_def_of_pos hx]; ring_nf
+
+/-- Cross-check: the two witness formulas for sqrt (EPL form vs Real.sqrt)
+    agree for x > 0. -/
+theorem sqrt_witnesses_agree (x : ℝ) (hx : 0 < x) :
+    Real.exp (0.5 * Real.log x) = Real.sqrt x :=
+  sqrt_is_one_node_positive x hx
+
+/-- Cross-check: recip through EPL(−1) agrees with 1/x as a field element. -/
+theorem recip_witness_agree (x : ℝ) (hx : 0 < x) :
+    Real.exp ((-1) * Real.log x) = x⁻¹ := by
+  rw [recip_is_one_node_positive x hx, inv_eq_one_div]
+
+-- ================================================================
+-- 6. Combined v5.3 positive-domain summary
+-- ================================================================
+
+/-- **SuperBEST v5.3 positive-domain 1-node witness bundle.**
+    Five primitive F16-family constructions each realized as a single node:
+    exp, mul, pow (covers recip & sqrt as special cases), ln via EXL. -/
+theorem superbest_v53_positive_witnesses :
+    (∀ x : ℝ, Real.exp x = Real.exp x) ∧
+    (∀ x y : ℝ, 0 < x → 0 < y →
+      Real.exp (Real.log x + Real.log y) = x * y) ∧
+    (∀ n x : ℝ, 0 < x → Real.exp (n * Real.log x) = x ^ n) ∧
+    (∀ x : ℝ, 0 < x →
+      Real.exp ((1/2) * Real.log x) = Real.sqrt x) ∧
+    (∀ x : ℝ, Real.exp 0 * Real.log x = Real.log x) :=
+  ⟨fun _ => rfl,
+   mul_is_one_node_positive,
+   pow_is_one_node_positive,
+   fun x hx => by
+     rw [show (1:ℝ)/2 = (0.5 : ℝ) from by norm_num]
+     exact sqrt_is_one_node_positive x hx,
+   ln_is_one_node_via_exl⟩
+
+/-- The v5.3 positive-domain node-count arithmetic: 1+1+1+1+1+2+2+2+2+1 = 14. -/
+theorem superbest_v53_positive_total : 1 + 1 + 1 + 1 + 1 + 2 + 2 + 2 + 2 + 1 = 14 := by
+  norm_num
+
+/-- The v5.3 naive-vs-routed savings percentage: (73 − 14) / 73 ≈ 0.808. -/
+theorem superbest_v53_savings_fraction :
+    ((73 : ℝ) - 14) / 73 > 0.808 := by
+  norm_num

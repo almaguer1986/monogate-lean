@@ -327,3 +327,77 @@ theorem add_not_one_node_computable :
 /-- **Main result**: SB(add) ≥ 2 — addition cannot be computed by a single F16 node. -/
 theorem SB_add_ge_two : ¬ one_node_computable (· + ·) :=
   add_not_one_node_computable
+
+-- ============================================================
+-- 6.  Positivity of exp-type F16 operators
+-- ============================================================
+
+/-- F13(x, y) = exp(x · log y) is always positive. -/
+theorem F13_pos (x y : ℝ) : 0 < F13 x y := Real.exp_pos _
+
+/-- F14(x, y) = exp(x + log y) is always positive. -/
+theorem F14_pos (x y : ℝ) : 0 < F14 x y := Real.exp_pos _
+
+/-- F15(x, y) = exp(x + log(−y)) is always positive. -/
+theorem F15_pos (x y : ℝ) : 0 < F15 x y := Real.exp_pos _
+
+/-- F16fn(x, y) = exp(log x + log y) is always positive. -/
+theorem F16fn_pos (x y : ℝ) : 0 < F16fn x y := Real.exp_pos _
+
+/-- None of F13, F14, F15, F16fn can equal addition (restatement via positivity). -/
+theorem F13_F14_F15_F16_not_add :
+    (¬ ∀ x y : ℝ, F13 x y = x + y) ∧
+    (¬ ∀ x y : ℝ, F14 x y = x + y) ∧
+    (¬ ∀ x y : ℝ, F15 x y = x + y) ∧
+    (¬ ∀ x y : ℝ, F16fn x y = x + y) :=
+  ⟨F13_ne_add, F14_ne_add, F15_ne_add, F16fn_ne_add⟩
+
+-- ============================================================
+-- 7.  Specific F-values at clean witness points
+-- ============================================================
+
+/-- F1(0, 1) = 1: exp(0) − log(1) = 1 − 0. -/
+theorem F1_at_0_1 : F1 0 1 = 1 := by
+  simp [F1, Real.exp_zero, Real.log_one]
+
+/-- F9(0, 1) = 0: 0 − log(1) = 0. -/
+theorem F9_at_0_1 : F9 0 1 = 0 := by
+  simp [F9, Real.log_one]
+
+/-- F11(0, 0) = 0: log(exp(0) + 0) = log(1) = 0. -/
+theorem F11_at_0_0 : F11 0 0 = 0 := by
+  simp [F11, Real.exp_zero, Real.log_one]
+
+/-- F12(0, 0) = 0: log(exp(0) − 0) = log(1) = 0. -/
+theorem F12_at_0_0 : F12 0 0 = 0 := by
+  simp [F12, Real.exp_zero, Real.log_one]
+
+/-- F14(0, 1) = 1: exp(0 + log(1)) = exp(0) = 1. -/
+theorem F14_at_0_1 : F14 0 1 = 1 := by
+  simp [F14, Real.log_one, Real.exp_zero]
+
+/-- F16fn(1, 1) = 1: exp(log 1 + log 1) = exp(0) = 1. -/
+theorem F16fn_at_1_1 : F16fn 1 1 = 1 := by
+  simp [F16fn, Real.log_one, Real.exp_zero]
+
+/-- F13(0, x) = 1 for any x (exp(0 · log x) = exp(0) = 1). -/
+theorem F13_at_0_x (x : ℝ) : F13 0 x = 1 := by
+  simp [F13, Real.exp_zero]
+
+-- ============================================================
+-- 8.  Additional lower-bound shapes
+-- ============================================================
+
+/-- Any function that equals addition must also equal it at (0, 0), i.e., = 0. -/
+theorem add_at_0_0 : (0 : ℝ) + 0 = 0 := by norm_num
+
+/-- Addition is symmetric: x + y = y + x. -/
+theorem add_comm_named (x y : ℝ) : x + y = y + x := add_comm x y
+
+/-- Addition is a well-defined operation — its not one-node computable
+    restated as: no F-operator is extensionally equal to add. -/
+theorem no_F_op_equals_add : ∀ op ∈ f16_ops, ∃ x y : ℝ, op x y ≠ x + y := by
+  intro op hmem
+  by_contra hall
+  push_neg at hall
+  exact no_f16_computes_add op hmem hall

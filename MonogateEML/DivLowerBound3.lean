@@ -148,4 +148,66 @@ theorem SB_div_ge_three_full (g h : ℝ → ℝ → ℝ)
     True := by
   trivial
 
+-- ================================================================
+-- Additional exp-type-outer restatements
+-- ================================================================
+
+/-- Restatement: the exp-type outer operators form a 4-element list. -/
+theorem exp_outer_list_length :
+    ([D_F13, D_F14, D_F15, D_F16] : List (ℝ → ℝ → ℝ)).length = 4 := rfl
+
+/-- D_F13 is in the exp-type outer list. -/
+theorem D_F13_mem_exp_outer :
+    D_F13 ∈ ([D_F13, D_F14, D_F15, D_F16] : List (ℝ → ℝ → ℝ)) := by
+  simp
+
+/-- D_F14 is in the exp-type outer list. -/
+theorem D_F14_mem_exp_outer :
+    D_F14 ∈ ([D_F13, D_F14, D_F15, D_F16] : List (ℝ → ℝ → ℝ)) := by
+  simp
+
+/-- D_F15 is in the exp-type outer list. -/
+theorem D_F15_mem_exp_outer :
+    D_F15 ∈ ([D_F13, D_F14, D_F15, D_F16] : List (ℝ → ℝ → ℝ)) := by
+  simp
+
+/-- D_F16 is in the exp-type outer list. -/
+theorem D_F16_mem_exp_outer :
+    D_F16 ∈ ([D_F13, D_F14, D_F15, D_F16] : List (ℝ → ℝ → ℝ)) := by
+  simp
+
+-- ================================================================
+-- Positive-domain 2-node upper bound restatements
+-- ================================================================
+
+/-- Restatement: division via D_F16 ∘ D_F13(−1, ·) on positive inputs. -/
+theorem div_via_two_node (x y : ℝ) (hx : 0 < x) (hy : 0 < y) :
+    D_F16 x (D_F13 (-1) y) = x / y :=
+  div_two_node_pos_domain x y hx hy
+
+/-- The D_F13(−1, y) inner node computes reciprocal: D_F13(−1, y) = 1/y for y > 0. -/
+theorem D_F13_neg_one_is_recip (y : ℝ) (hy : 0 < y) :
+    D_F13 (-1) y = 1 / y := by
+  unfold D_F13
+  rw [show (-1 : ℝ) * Real.log y = -(Real.log y) from by ring,
+      Real.exp_neg, Real.exp_log hy, inv_eq_one_div]
+
+/-- The D_F13(−1, y) value is strictly positive (positivity of exp; no
+    domain hypothesis needed). -/
+theorem D_F13_neg_one_pos (y : ℝ) : 0 < D_F13 (-1) y := Real.exp_pos _
+
+-- ================================================================
+-- Cross-check consistency: always_pos_ne_div coverage
+-- ================================================================
+
+/-- Restatement of the structural impossibility: an always-positive binary
+    function can't be division on ℝ² since division is negative at (−1, 2). -/
+theorem always_pos_not_div_alt (f : ℝ → ℝ → ℝ) (hf : ∀ x y, 0 < f x y) :
+    ∃ x y : ℝ, f x y ≠ x / y := by
+  use -1, 2
+  have : 0 < f (-1) 2 := hf (-1) 2
+  intro heq
+  rw [heq] at this
+  norm_num at this
+
 end DivLowerBound3

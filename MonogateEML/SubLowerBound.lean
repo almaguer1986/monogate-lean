@@ -53,46 +53,46 @@ noncomputable def S_F16 (x y : ℝ) : ℝ := Real.exp (Real.log x + Real.log y)
 
 -- F1(1,1) = exp(1) ≠ 0 = 1−1
 theorem S_F1_ne_sub : ¬ (∀ x y : ℝ, S_F1 x y = x - y) := by
-  intro h; have := h 1 1; simp [S_F1, Real.log_one] at this; linarith [two_lt_exp_one']
+  intro h; have := h 1 1; simp [S_F1, Real.log_one] at this; try linarith [two_lt_exp_one']
 
 -- F2(0,−1) = exp(0)−log(1) = 1 ≠ 0−(−1) = 1 ... actually let's use (1,−1)
 -- sub(1,−1) = 2. F2(1,−1) = exp(1)−log(1) = exp(1). exp(1) ≠ 2.
 theorem S_F2_ne_sub : ¬ (∀ x y : ℝ, S_F2 x y = x - y) := by
   intro h; have := h 1 (-1); simp [S_F2, neg_neg, Real.log_one] at this
-  linarith [two_lt_exp_one']
+  try linarith [two_lt_exp_one']
 
 -- F3(1,1) = exp(−1) ≠ 0 = 1−1
 theorem S_F3_ne_sub : ¬ (∀ x y : ℝ, S_F3 x y = x - y) := by
-  intro h; have := h 1 1; simp [S_F3, Real.log_one] at this; linarith [exp_neg_one_lt_one']
+  intro h; have := h 1 1; simp [S_F3, Real.log_one] at this; try linarith [exp_neg_one_lt_one']
 
 -- F4(0,−1) = exp(0)−log(1) = 1 ≠ 0−(−1) = 1 ... use (1,−1): F4(1,−1)=exp(−1) ≠ 2
 theorem S_F4_ne_sub : ¬ (∀ x y : ℝ, S_F4 x y = x - y) := by
   intro h; have := h 1 (-1); simp [S_F4, neg_neg, Real.log_one] at this
-  linarith [exp_neg_one_lt_one']
+  try linarith [exp_neg_one_lt_one']
 
 -- F5(1,1) = exp(1)−log(1) = exp(1) ≠ 0 = 1−1
 theorem S_F5_ne_sub : ¬ (∀ x y : ℝ, S_F5 x y = x - y) := by
-  intro h; have := h 1 1; simp [S_F5, Real.log_one] at this; linarith [two_lt_exp_one']
+  intro h; have := h 1 1; simp [S_F5, Real.log_one] at this; try linarith [two_lt_exp_one']
 
 -- F6(1,1) = exp(−1) ≠ 0
 theorem S_F6_ne_sub : ¬ (∀ x y : ℝ, S_F6 x y = x - y) := by
-  intro h; have := h 1 1; simp [S_F6, Real.log_one] at this; linarith [exp_neg_one_lt_one']
+  intro h; have := h 1 1; simp [S_F6, Real.log_one] at this; try linarith [exp_neg_one_lt_one']
 
 -- F7(−1,0) = exp(0)−log(1) = 1 ≠ −1−0 = −1
 theorem S_F7_ne_sub : ¬ (∀ x y : ℝ, S_F7 x y = x - y) := by
-  intro h; have := h (-1) 0; simp [S_F7, Real.exp_zero, neg_neg, Real.log_one] at this; linarith
+  intro h; have := h (-1) 0; simp [S_F7, Real.exp_zero, neg_neg, Real.log_one] at this; try linarith
 
 -- F8(−1,0) = exp(0)−log(1) = 1 ≠ −1
 theorem S_F8_ne_sub : ¬ (∀ x y : ℝ, S_F8 x y = x - y) := by
-  intro h; have := h (-1) 0; simp [S_F8, neg_zero, Real.exp_zero, neg_neg, Real.log_one] at this; linarith
+  intro h; have := h (-1) 0; simp [S_F8, neg_zero, Real.exp_zero, neg_neg, Real.log_one] at this; try linarith
 
 -- F9(0,1) = 0−log(1) = 0 ≠ 0−1 = −1
 theorem S_F9_ne_sub : ¬ (∀ x y : ℝ, S_F9 x y = x - y) := by
-  intro h; have := h 0 1; simp [S_F9, Real.log_one] at this; linarith
+  intro h; have := h 0 1; simp [S_F9, Real.log_one] at this; try linarith
 
 -- F10(0,−1) = 0−log(1) = 0 ≠ 0−(−1) = 1
 theorem S_F10_ne_sub : ¬ (∀ x y : ℝ, S_F10 x y = x - y) := by
-  intro h; have := h 0 (-1); simp [S_F10, neg_neg, Real.log_one] at this; linarith
+  intro h; have := h 0 (-1); simp [S_F10, neg_neg, Real.log_one] at this; try linarith
 
 -- F11(0,1) = log(2) ≠ −1 = 0−1. log(2)>0>−1.
 theorem S_F11_ne_sub : ¬ (∀ x y : ℝ, S_F11 x y = x - y) := by
@@ -113,21 +113,21 @@ theorem S_F12_ne_sub : ¬ (∀ x y : ℝ, S_F12 x y = x - y) := by
 
 -- F13(1,1) = exp(1·log(1)) = exp(0) = 1 ≠ 0 = 1−1
 theorem S_F13_ne_sub : ¬ (∀ x y : ℝ, S_F13 x y = x - y) := by
-  intro h; have := h 1 1; simp [S_F13, Real.log_one, mul_zero, Real.exp_zero] at this; linarith
+  intro h; have := h 1 1; simp [S_F13, Real.log_one, mul_zero, Real.exp_zero] at this; try linarith
 
 -- F14(1,1) = exp(1+log(1)) = exp(1) ≠ 0
 theorem S_F14_ne_sub : ¬ (∀ x y : ℝ, S_F14 x y = x - y) := by
-  intro h; have := h 1 1; simp [S_F14, Real.log_one, add_zero] at this; linarith [two_lt_exp_one']
+  intro h; have := h 1 1; simp [S_F14, Real.log_one, add_zero] at this; try linarith [two_lt_exp_one']
 
 -- F15(0,−1) = exp(0+log(1)) = exp(0) = 1 ≠ 0−(−1) = 1 ... use (1,−1)
 -- sub(1,−1)=2. F15(1,−1)=exp(1+log(1))=exp(1)≠2
 theorem S_F15_ne_sub : ¬ (∀ x y : ℝ, S_F15 x y = x - y) := by
   intro h; have := h 1 (-1); simp [S_F15, neg_neg, Real.log_one, add_zero] at this
-  linarith [two_lt_exp_one']
+  try linarith [two_lt_exp_one']
 
 -- F16(1,1) = exp(log(1)+log(1)) = exp(0) = 1 ≠ 0 = 1−1
 theorem S_F16_ne_sub : ¬ (∀ x y : ℝ, S_F16 x y = x - y) := by
-  intro h; have := h 1 1; simp [S_F16, Real.log_one, add_zero, Real.exp_zero] at this; linarith
+  intro h; have := h 1 1; simp [S_F16, Real.log_one, add_zero, Real.exp_zero] at this; try linarith
 
 noncomputable def s_f16_ops : List (ℝ → ℝ → ℝ) :=
   [S_F1, S_F2, S_F3, S_F4, S_F5, S_F6, S_F7, S_F8,
@@ -163,3 +163,64 @@ def one_node_computable_sub (f : ℝ → ℝ → ℝ) : Prop :=
 theorem SB_sub_ge_two : ¬ one_node_computable_sub (· - ·) := by
   intro ⟨op, hmem, heq⟩
   exact no_f16_computes_sub op hmem (fun x y => (heq x y).symm)
+
+-- ============================================================
+-- Positivity of exp-type F16 operators
+-- ============================================================
+
+/-- S_F13 is always positive. -/
+theorem S_F13_pos (x y : ℝ) : 0 < S_F13 x y := Real.exp_pos _
+
+/-- S_F14 is always positive. -/
+theorem S_F14_pos (x y : ℝ) : 0 < S_F14 x y := Real.exp_pos _
+
+/-- S_F15 is always positive. -/
+theorem S_F15_pos (x y : ℝ) : 0 < S_F15 x y := Real.exp_pos _
+
+/-- S_F16 is always positive. -/
+theorem S_F16_pos (x y : ℝ) : 0 < S_F16 x y := Real.exp_pos _
+
+-- ============================================================
+-- Specific F-values at clean witness points
+-- ============================================================
+
+/-- S_F1(0, 1) = 1: exp(0) − log(1). -/
+theorem S_F1_at_0_1 : S_F1 0 1 = 1 := by
+  simp [S_F1, Real.exp_zero, Real.log_one]
+
+/-- S_F9(0, 1) = 0. -/
+theorem S_F9_at_0_1 : S_F9 0 1 = 0 := by
+  simp [S_F9, Real.log_one]
+
+/-- S_F11(0, 0) = 0. -/
+theorem S_F11_at_0_0 : S_F11 0 0 = 0 := by
+  simp [S_F11, Real.exp_zero, Real.log_one]
+
+/-- S_F13(0, x) = 1 for any x. -/
+theorem S_F13_at_0_x (x : ℝ) : S_F13 0 x = 1 := by
+  simp [S_F13, Real.exp_zero]
+
+-- ============================================================
+-- Restatements of the main result
+-- ============================================================
+
+/-- Subtraction is not one-node computable (restatement). -/
+theorem sub_not_one_node_computable : ¬ one_node_computable_sub (· - ·) :=
+  SB_sub_ge_two
+
+/-- No F16 operator equals subtraction (restatement via witness existence). -/
+theorem no_F_op_equals_sub :
+    ∀ op ∈ s_f16_ops, ∃ x y : ℝ, op x y ≠ x - y := by
+  intro op hmem
+  by_contra hall
+  push_neg at hall
+  exact no_f16_computes_sub op hmem hall
+
+/-- Subtraction is antisymmetric: x − y = −(y − x). -/
+theorem sub_antisymm (x y : ℝ) : x - y = -(y - x) := by ring
+
+/-- Subtraction is well-defined: x − 0 = x. -/
+theorem sub_zero_named (x : ℝ) : x - 0 = x := sub_zero x
+
+/-- Subtraction at (0, 0) is 0. -/
+theorem sub_at_0_0 : (0 : ℝ) - 0 = 0 := by norm_num

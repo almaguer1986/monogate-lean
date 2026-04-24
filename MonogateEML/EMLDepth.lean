@@ -144,3 +144,94 @@ example : eulerTree.depth = 1 := expTree_depth
 /-- The Euler gateway tree evaluates correctly at x = 0. -/
 example : eulerTree.eval 0 = 1 := by
   simp [eulerTree, EMLTree.eval, Complex.log_one]
+
+-- ============================================================
+-- 8. Depth computation lemmas
+-- ============================================================
+
+/-- The depth of a constant node is 0. -/
+theorem depth_of_const (c : ℂ) : (EMLTree.const c).depth = 0 := rfl
+
+/-- The depth of the variable node is 0. -/
+theorem depth_of_var : EMLTree.var.depth = 0 := rfl
+
+/-- The depth of a `ceml` node is `1 + max`. -/
+theorem depth_of_ceml (t₁ t₂ : EMLTree) :
+    (EMLTree.ceml t₁ t₂).depth = 1 + max t₁.depth t₂.depth := rfl
+
+/-- Depth is a natural number; `ceml` contributes at least 1. -/
+theorem depth_ceml_pos (t₁ t₂ : EMLTree) :
+    0 < (EMLTree.ceml t₁ t₂).depth := by
+  simp [EMLTree.depth]
+
+/-- Depth is monotone under the first argument of `ceml`. -/
+theorem depth_mono_left (t₁ t₂ : EMLTree) :
+    t₁.depth ≤ (EMLTree.ceml t₁ t₂).depth := by
+  simp [EMLTree.depth]; linarith [le_max_left t₁.depth t₂.depth]
+
+/-- Depth is monotone under the second argument of `ceml`. -/
+theorem depth_mono_right (t₁ t₂ : EMLTree) :
+    t₂.depth ≤ (EMLTree.ceml t₁ t₂).depth := by
+  simp [EMLTree.depth]; linarith [le_max_right t₁.depth t₂.depth]
+
+-- ============================================================
+-- 9. EML-k membership witnesses (depth ≤ k)
+-- ============================================================
+
+/-- Any constant function c is in EML-k for every k (use a const tree of depth 0). -/
+theorem const_in_EML_k (c : ℂ) (k : ℕ) : (fun _ : ℂ => c) ∈ EML_k k := by
+  refine ⟨.const c, ?_, ?_⟩
+  · simp [EMLTree.depth]
+  · intro x; simp [EMLTree.eval]
+
+/-- The identity function is in EML-k for every k (use the var tree of depth 0). -/
+theorem id_in_EML_k (k : ℕ) : (fun x : ℂ => x) ∈ EML_k k := by
+  refine ⟨.var, ?_, ?_⟩
+  · simp [EMLTree.depth]
+  · intro x; simp [EMLTree.eval]
+
+/-- Complex.exp is in EML-1 (via the eulerTree depth-1 witness). -/
+theorem exp_in_EML_one : (fun x : ℂ => Complex.exp x) ∈ EML_k 1 := by
+  refine ⟨eulerTree, ?_, ?_⟩
+  · simp [eulerTree, EMLTree.depth]
+  · intro x; simp [eulerTree, EMLTree.eval, Complex.log_one]
+
+-- ============================================================
+-- 10. Tree depth monotone in k (EML-k ⊆ EML-(k+1))
+-- ============================================================
+
+/-- Any tree that is in EML-k is also in EML-(k+1) (trivial). -/
+theorem EML_k_subset_EML_succ (k : ℕ) : EML_k k ⊆ EML_k (k + 1) := by
+  rintro f ⟨t, hdepth, heval⟩
+  exact ⟨t, by linarith, heval⟩
+
+/-- Any tree in EML-k is in EML-m for m ≥ k. -/
+theorem EML_k_subset_of_le {k m : ℕ} (h : k ≤ m) : EML_k k ⊆ EML_k m := by
+  rintro f ⟨t, hdepth, heval⟩
+  exact ⟨t, le_trans hdepth h, heval⟩
+
+-- ============================================================
+-- 11. Concrete depth evaluation
+-- ============================================================
+
+/-- `ceml (var) (const 1)` has depth 1 (the depth of eulerTree). -/
+theorem eulerTree_depth_one : eulerTree.depth = 1 := by
+  simp [eulerTree, EMLTree.depth]
+
+/-- The `ceml` of two depth-0 trees has depth exactly 1. -/
+theorem depth_ceml_of_atoms (t₁ t₂ : EMLTree)
+    (h₁ : t₁.depth = 0) (h₂ : t₂.depth = 0) :
+    (EMLTree.ceml t₁ t₂).depth = 1 := by
+  simp [EMLTree.depth, h₁, h₂]
+
+-- ============================================================
+-- 12. Stability of evalReal for atoms
+-- ============================================================
+
+/-- The constant tree evaluates to the real part of its constant. -/
+theorem evalReal_const_eq_re (c : ℂ) (x : ℝ) :
+    (EMLTree.const c).evalReal x = c.re := const_tree_evalReal c x
+
+/-- The var tree evaluates to the identity on reals. -/
+theorem evalReal_var_eq_id (x : ℝ) :
+    EMLTree.var.evalReal x = x := var_tree_evalReal x

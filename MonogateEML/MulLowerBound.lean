@@ -160,3 +160,73 @@ def mul_one_node_computable (f : ℝ → ℝ → ℝ) : Prop :=
 theorem SB_mul_ge_two : ¬ mul_one_node_computable (· * ·) := by
   intro ⟨op, hmem, heq⟩
   exact no_f16_computes_mul op hmem (fun x y => (heq x y).symm)
+
+-- ============================================================
+-- Positivity of exp-type F16 operators
+-- ============================================================
+
+/-- M_F13 is always positive. -/
+theorem M_F13_pos (x y : ℝ) : 0 < M_F13 x y := Real.exp_pos _
+
+/-- M_F14 is always positive. -/
+theorem M_F14_pos (x y : ℝ) : 0 < M_F14 x y := Real.exp_pos _
+
+/-- M_F15 is always positive. -/
+theorem M_F15_pos (x y : ℝ) : 0 < M_F15 x y := Real.exp_pos _
+
+/-- M_F16 is always positive. -/
+theorem M_F16_pos (x y : ℝ) : 0 < M_F16 x y := Real.exp_pos _
+
+-- ============================================================
+-- Specific F-values at clean witness points
+-- ============================================================
+
+/-- M_F1(0, 1) = 1. -/
+theorem M_F1_at_0_1 : M_F1 0 1 = 1 := by
+  simp [M_F1, Real.exp_zero, Real.log_one]
+
+/-- M_F9(0, 1) = 0. -/
+theorem M_F9_at_0_1 : M_F9 0 1 = 0 := by
+  simp [M_F9, Real.log_one]
+
+/-- M_F13(0, x) = 1 for any x. -/
+theorem M_F13_at_0_x (x : ℝ) : M_F13 0 x = 1 := by
+  simp [M_F13, Real.exp_zero]
+
+/-- M_F16(1, 1) = 1 (exp(log 1 + log 1) = exp 0 = 1). -/
+theorem M_F16_at_1_1 : M_F16 1 1 = 1 := by
+  simp [M_F16, Real.log_one, Real.exp_zero]
+
+-- ============================================================
+-- Restatements of the main result
+-- ============================================================
+
+/-- Multiplication is not one-node computable on all of ℝ² (restatement). -/
+theorem mul_not_one_node_computable_general : ¬ mul_one_node_computable (· * ·) :=
+  SB_mul_ge_two
+
+/-- No F16 operator equals multiplication on all of ℝ². -/
+theorem no_F_op_equals_mul :
+    ∀ op ∈ m_f16_ops, ∃ x y : ℝ, op x y ≠ x * y := by
+  intro op hmem
+  by_contra hall
+  push_neg at hall
+  exact no_f16_computes_mul op hmem hall
+
+/-- Multiplication is commutative. -/
+theorem mul_comm_named (x y : ℝ) : x * y = y * x := mul_comm x y
+
+/-- Multiplication is associative. -/
+theorem mul_assoc_named (x y z : ℝ) : (x * y) * z = x * (y * z) := mul_assoc x y z
+
+/-- Multiplication by zero annihilates. -/
+theorem mul_zero_named (x : ℝ) : x * 0 = 0 := mul_zero x
+
+/-- Multiplication by one is identity. -/
+theorem mul_one_named (x : ℝ) : x * 1 = x := mul_one x
+
+/-- Multiplication at (0, 0) is 0. -/
+theorem mul_at_0_0 : (0 : ℝ) * 0 = 0 := by norm_num
+
+/-- Multiplication at (1, 1) is 1. -/
+theorem mul_at_1_1 : (1 : ℝ) * 1 = 1 := by norm_num

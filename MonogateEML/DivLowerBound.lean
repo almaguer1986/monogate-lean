@@ -161,3 +161,70 @@ def div_one_node_computable (f : ℝ → ℝ → ℝ) : Prop :=
 theorem SB_div_ge_two : ¬ div_one_node_computable (· / ·) := by
   intro ⟨op, hmem, heq⟩
   exact no_f16_computes_div op hmem (fun x y => (heq x y).symm)
+
+-- ============================================================
+-- Positivity of exp-type F16 operators
+-- ============================================================
+
+/-- D_F13 is always positive. -/
+theorem D_F13_pos_named (x y : ℝ) : 0 < D_F13 x y := Real.exp_pos _
+
+/-- D_F14 is always positive. -/
+theorem D_F14_pos_named (x y : ℝ) : 0 < D_F14 x y := Real.exp_pos _
+
+/-- D_F15 is always positive. -/
+theorem D_F15_pos_named (x y : ℝ) : 0 < D_F15 x y := Real.exp_pos _
+
+/-- D_F16 is always positive. -/
+theorem D_F16_pos_named (x y : ℝ) : 0 < D_F16 x y := Real.exp_pos _
+
+-- ============================================================
+-- Specific F-values at clean witness points
+-- ============================================================
+
+/-- D_F1(0, 1) = 1. -/
+theorem D_F1_at_0_1 : D_F1 0 1 = 1 := by
+  simp [D_F1, Real.exp_zero, Real.log_one]
+
+/-- D_F9(0, 1) = 0. -/
+theorem D_F9_at_0_1 : D_F9 0 1 = 0 := by
+  simp [D_F9, Real.log_one]
+
+/-- D_F13(0, x) = 1 for any x. -/
+theorem D_F13_at_0_x (x : ℝ) : D_F13 0 x = 1 := by
+  simp [D_F13, Real.exp_zero]
+
+/-- D_F16(1, 1) = 1. -/
+theorem D_F16_at_1_1 : D_F16 1 1 = 1 := by
+  simp [D_F16, Real.log_one, Real.exp_zero]
+
+-- ============================================================
+-- Restatements of the main result
+-- ============================================================
+
+/-- Division is not one-node computable on all of ℝ² (restatement). -/
+theorem div_not_one_node_computable_general : ¬ div_one_node_computable (· / ·) :=
+  SB_div_ge_two
+
+/-- No F16 operator equals division on all of ℝ². -/
+theorem no_F_op_equals_div :
+    ∀ op ∈ d_f16_ops, ∃ x y : ℝ, op x y ≠ x / y := by
+  intro op hmem
+  by_contra hall
+  push_neg at hall
+  exact no_f16_computes_div op hmem hall
+
+/-- Division by zero is zero (Lean convention via Real.div). -/
+theorem div_zero_named (x : ℝ) : x / 0 = 0 := div_zero x
+
+/-- Division at (0, 1) is 0. -/
+theorem div_at_0_1 : (0 : ℝ) / 1 = 0 := by norm_num
+
+/-- Division at (1, 1) is 1. -/
+theorem div_at_1_1 : (1 : ℝ) / 1 = 1 := by norm_num
+
+/-- x / y = x · y⁻¹ (definitional). -/
+theorem div_eq_mul_inv_named (x y : ℝ) : x / y = x * y⁻¹ := div_eq_mul_inv x y
+
+/-- Division by itself: x / x = 1 for x ≠ 0. -/
+theorem div_self_named (x : ℝ) (hx : x ≠ 0) : x / x = 1 := div_self hx
