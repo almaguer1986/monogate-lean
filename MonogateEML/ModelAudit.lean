@@ -21,24 +21,25 @@ Proved below: mul_is_one_node_positive.
 For general domain (all reals): no single F16 operator computes x·y.
 Proved: MulLowerBound.lean (SB_mul_ge_two), 0 sorries.
 
-## Corrected SuperBEST v5.2 (positive domain)
+## Corrected SuperBEST v5.3 (positive domain)
 
-| Operation  | v5.1 | v5.2 | Note                                         |
-|------------|------|------|----------------------------------------------|
-| exp(x)     | 1n   | 1n   | unchanged                                    |
-| ln(x)      | 1n   | 1n   | unchanged                                    |
-| recip(x)   | 1n   | 1n   | EPL(−1, x) = 1/x                             |
-| sqrt(x)    | 2n   | 1n ← EPL(0.5, x) = √x  [CORRECTED]          |
-| pow(x,n)   | 1n   | 1n   | EPL(n, x) = x^n                              |
-| neg(x)     | 2n   | 2n   | proved: NegLowerBound.lean                   |
-| add(x,y)   | 2n   | 2n   | proved: AddLowerBound.lean                   |
-| sub(x,y)   | 2n   | 2n   | proved: SubLowerBound.lean                   |
-| mul(x,y)   | 2n   | 2n   | empirically verified no 1-node circuit       |
-| div(x,y)   | 2n   | 2n   | unchanged                                    |
+| Operation  | v5.1 | v5.2 | v5.3 | Note                                         |
+|------------|------|------|------|----------------------------------------------|
+| exp(x)     | 1n   | 1n   | 1n   | unchanged                                    |
+| ln(x)      | 1n   | 1n   | 1n   | unchanged                                    |
+| recip(x)   | 1n   | 1n   | 1n   | EPL(−1, x) = 1/x                             |
+| sqrt(x)    | 2n   | 1n   | 1n   | EPL(0.5, x) = √x (v5.2 correction)           |
+| pow(x,n)   | 1n   | 1n   | 1n   | EPL(n, x) = x^n                              |
+| neg(x)     | 2n   | 2n   | 2n   | proved: NegLowerBound.lean                   |
+| add(x,y)   | 2n   | 2n   | 2n   | proved: AddLowerBound.lean                   |
+| sub(x,y)   | 2n   | 2n   | 2n   | proved: SubLowerBound.lean                   |
+| mul(x,y)   | 2n   | 1n   | 1n ← UpperBounds.mul_one_node_positive (positive domain F16fn) |
+| div(x,y)   | 2n   | 2n   | 2n   | DivLowerBound3.div_two_node_pos_domain       |
 
-Corrected positive total: 1+1+1+1+1+2+2+2+2+2 = 15n
-Corrected savings: (73−15)/73 = 58/73 ≈ 79.5%
-v5.1 total was 16n / 78.1% — correction: −1n from sqrt.
+Corrected positive total: 1+1+1+1+1+2+2+2+2+1 = 14n
+Corrected savings: (73−14)/73 = 59/73 ≈ 80.8%
+v5.2 total was 15n / 79.5%; v5.3 reflects the mul-positive 1n upgrade
+proved by UpperBounds.lean (mul_one_node_positive). v5.1 was 16n / 78.1%.
 -/
 
 open Real

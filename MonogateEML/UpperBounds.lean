@@ -79,7 +79,26 @@ theorem sqrt_one_node_positive' (x : ℝ) (hx : 0 < x) :
   exact rpow_one_node_positive (1/2) x hx
 
 -- ===================================================================
--- 6. exp(x + log(y)) = exp(x) * y  [F14 identity]  for y > 0
+-- 6. log(x) = exp(0) * log(x)   [EXL identity]   for all x
+-- ===================================================================
+
+/-- EXL identity: exp(0) * log(x) = log(x) for all real x.
+
+    Justifies the SuperBEST 1-node accounting of `ln(x)` via the extended
+    operator EXL(a, b) := exp(a) * log(b), with EXL(0, x) = log(x).
+
+    Note on scope: EXL is in the extended 23-operator catalogue (it has
+    the form h(exp(±x), log(±y)) with h(u, v) = u * v) but is not one of
+    the F1..F16 operators defined in AddLowerBound.lean / DivLowerBound.lean
+    (which use h ∈ {subtraction, identity, log-of-arithmetic, exp-of-arithmetic}).
+    The 14n SuperBEST headline that counts ln = 1n therefore relies on this
+    extended-op accounting. -/
+theorem ln_one_node_via_exl (x : ℝ) :
+    Real.exp 0 * Real.log x = Real.log x := by
+  rw [Real.exp_zero, one_mul]
+
+-- ===================================================================
+-- 7. exp(x + log(y)) = exp(x) * y  [F14 identity]  for y > 0
 -- ===================================================================
 
 /-- F14 identity: exp(x + log(y)) = exp(x) · y for y > 0.
