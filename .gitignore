@@ -1,0 +1,7 @@
+# Lean build output
+.lake/
+build/
+*.olean
+
+# Graphify analysis output (config in .graphifyignore is committed)
+graphify-out/
