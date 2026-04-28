@@ -15,6 +15,23 @@
 --
 -- Session: blind-exploration follow-up; not yet user-verified in VS Code.
 -- T_EAL_EXL_CONJ / T_EML_EDL_CONJ
+--
+-- NAMING-CLARIFICATION (filed 2026-04-27 EVE):
+-- The names "EXL" and "EDL" used in this file refer to the binary
+-- operators
+--    EXL(x, y) = exp(x) * ln(y)        diagonal: g(y) = exp(y) * ln(y)
+--    EDL(x, y) = exp(x) / ln(y)        diagonal: g(y) = exp(y) / ln(y)
+--
+-- These are DIFFERENT from the F16 glossary in
+-- monogate-research/data/superbest.md, where:
+--    F13 EXL(x, y) = exp(x * ln(y)) = y^x        diagonal: x^x
+--
+-- Both naming conventions are mathematically valid; the overlap is in
+-- the name only. The conjugacy theorems below are correct under THIS
+-- file's conventions. Empirical numerical confirmation at 30+ digit
+-- precision is in
+-- monogate-research/exploration/f16-self-map-dynamics-2026-04-27/.
+-- Reconciliation between the two conventions is pending.
 
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Analysis.SpecialFunctions.Exp
