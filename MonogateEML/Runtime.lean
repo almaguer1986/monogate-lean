@@ -257,11 +257,39 @@ theorem mg_softplus_route_eq_softplus_in_middle_band
   simp [hlt, hgt]
 
 /-- Approximation bound for the saturation branch of `softplus_route`.
-    For x > 20: |softplus(x) - x| < exp(-20) (by 1+exp(x) ≈ exp(x) and
-    log near-additivity). Standard analysis -- proof TODO. -/
+    For x > 20: |softplus(x) - x| < exp(-20).
+
+    Proof: 1 + exp(x) = exp(x)·(1 + exp(-x)), so
+    log(1 + exp(x)) = x + log(1 + exp(-x)). The route returns `x`,
+    so the residual is exactly log(1 + exp(-x)), which is bounded
+    above by exp(-x) (via log(t) ≤ t-1) and exp(-x) < exp(-20). -/
 theorem mg_softplus_route_bound_high (x : ℝ) (hx : 20 < x) :
     |mg_softplus_route x - mg_softplus x| < Real.exp (-20) := by
-  sorry
+  have hroute : mg_softplus_route x = x := by
+    unfold mg_softplus_route
+    rw [if_pos hx]
+  rw [hroute]
+  unfold mg_softplus
+  have hexpx      : (0 : ℝ) < Real.exp x      := Real.exp_pos x
+  have hexpnx     : (0 : ℝ) < Real.exp (-x)   := Real.exp_pos (-x)
+  have hpos_inner : (0 : ℝ) < 1 + Real.exp (-x) := by linarith
+  have hxinv : Real.exp x * Real.exp (-x) = 1 := by
+    rw [← Real.exp_add, show x + -x = (0 : ℝ) from by ring, Real.exp_zero]
+  have hfact : (1 : ℝ) + Real.exp x = Real.exp x * (1 + Real.exp (-x)) := by
+    rw [mul_add, mul_one, hxinv]; ring
+  have hlogsplit : Real.log (1 + Real.exp x)
+                 = x + Real.log (1 + Real.exp (-x)) := by
+    rw [hfact, Real.log_mul hexpx.ne' hpos_inner.ne', Real.log_exp]
+  rw [hlogsplit]
+  have hlog_nonneg : (0 : ℝ) ≤ Real.log (1 + Real.exp (-x)) :=
+    Real.log_nonneg (by linarith)
+  rw [show x - (x + Real.log (1 + Real.exp (-x)))
+        = -Real.log (1 + Real.exp (-x)) from by ring,
+      abs_neg, abs_of_nonneg hlog_nonneg]
+  calc Real.log (1 + Real.exp (-x))
+      ≤ (1 + Real.exp (-x)) - 1 := Real.log_le_sub_one_of_pos hpos_inner
+    _ = Real.exp (-x)           := by ring
+    _ < Real.exp (-20)          := Real.exp_lt_exp.mpr (by linarith)
 
 end -- noncomputable section
 
