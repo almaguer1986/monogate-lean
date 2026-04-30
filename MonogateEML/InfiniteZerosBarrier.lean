@@ -65,20 +65,22 @@ def EMLTree.WellFormedPos : EMLTree → ℝ → Prop
 -- Part A: sin(x) has infinitely many zeros (0 sorry)
 -- ===================================================================
 
-/-- sin(n · π) = 0 for every integer n. -/
+/-- `sin(n · π) = 0` for every integer `n`. Direct alias for the
+Mathlib lemma so downstream theorems read in EML notation. -/
 theorem sin_int_pi_zero (n : ℤ) : Real.sin (n * Real.pi) = 0 :=
   Real.sin_int_mul_pi n
 
-/-- sin has infinitely many zeros: the sequence nπ gives distinct zeros for all n ∈ ℤ. -/
+/-- `sin` has infinitely many real zeros, witnessed by `n ↦ nπ`.
+
+The injection `ℤ ↪ {x | sin x = 0}` follows from `mul_right_cancel₀`
+on `Real.pi_ne_zero`, then `Set.infinite_of_injective_forall_mem`
+discharges the rest. -/
 theorem sin_has_infinitely_many_zeros :
-    Set.Infinite {x : ℝ | Real.sin x = 0} := by
-  have hrange : Set.range (fun n : ℤ => (n : ℝ) * Real.pi) ⊆ {x : ℝ | Real.sin x = 0} :=
-    fun _ ⟨n, hn⟩ => hn ▸ sin_int_pi_zero n
-  have hinj : Function.Injective (fun n : ℤ => (n : ℝ) * Real.pi) := by
-    intro m n hmn
-    have hpi : Real.pi ≠ 0 := Real.pi_ne_zero
-    exact_mod_cast mul_right_cancel₀ hpi (by exact_mod_cast hmn : (m : ℝ) * Real.pi = n * Real.pi)
-  exact (Set.infinite_range_of_injective hinj).mono hrange
+    Set.Infinite {x : ℝ | Real.sin x = 0} :=
+  Set.infinite_of_injective_forall_mem
+    (f := fun n : ℤ => (n : ℝ) * Real.pi)
+    (fun _ _ h => by exact_mod_cast mul_right_cancel₀ Real.pi_ne_zero h)
+    (fun n => Real.sin_int_mul_pi n)
 
 -- ===================================================================
 -- Part B: Analytic non-zero functions have finitely many zeros (0 sorry)
@@ -316,29 +318,77 @@ lemma depth1_finite_zeros_real (t : EMLTree) (ht : t.depth ≤ 1) (a b : ℝ) (h
 -- ===================================================================
 
 open EMLTree in
-/-- T01 (Infinite Zeros Barrier): sin is not representable by any finite EML tree.
+/-- T01 (Infinite Zeros Barrier) — open.
 
-Sorry: quantitative zero-count bound needed — EML-k trees have ≤ B(k) zeros on ℝ.
-This requires o-minimal structure theory (ℝ_exp is o-minimal). -/
+`sin` is not representable by any finite EML tree.
+
+### Mathematical content
+
+Every depth-`k` EML tree (in the F16 grammar) is real-analytic on
+`(0, ∞)` and has only finitely many zeros on every bounded
+sub-interval — let `B(k)` be that bound. `sin` has a zero at
+every `nπ`, hence infinitely many on every unbounded interval.
+For sufficiently large intervals the zero count exceeds `B(k)`,
+contradiction.
+
+### Why it matters
+
+This is **T01**, the headline barrier theorem of the EML/Pfaffian
+hierarchy: it shows the entire EML grammar (under any depth) is
+strictly weaker than `ℝ_an,exp`. Forge's runtime treats `sin` as
+an external transcendental for exactly this reason.
+
+### Mathlib infrastructure needed
+
+* Khovanskii's zero-count theorem on Pfaffian chains: every
+  Pfaffian function of order `r` and degree `d` has at most a
+  polynomial-in-`(r, d)` number of zeros on a bounded interval.
+* Equivalently, the o-minimality of `ℝ_exp` (Wilkie 1996), which
+  gives a uniform finite-zero bound for every definable function.
+* `Real.exp` and `Real.log` are already in Mathlib; what's
+  missing is the meta-theorem that the structure they generate
+  is o-minimal, plus the constructive zero bound that drops out
+  of o-minimality. Tracking issue: see
+  `MATHLIB_KHOVANSKII_NEEDS.md` for a survey of the gap. -/
 theorem sin_not_in_eml (k : ℕ) :
     ∀ t : EMLTree, t.depth ≤ k →
       ¬ (∀ x : ℝ, t.evalReal x = Real.sin x) := by
-  sorry
+  sorry  -- Open: needs Khovanskii zero-count or o-minimal ℝ_exp.
+         -- See docstring for the missing Mathlib infrastructure.
 
 -- ===================================================================
 -- CEML-T48: sin(x) ∉ EML-k(ℝ) for any finite k (1 sorry)
 -- ===================================================================
 
-/-- CEML-T48: sin(x) ∉ EML-k(ℝ) for any finite k.
-    Moved from EMLDepth.lean (avoids circular import).
-    Sorry: finite zeros induction (needs o-minimal structure theory). -/
+/-- **CEML-T48: `sin` is not in `EML-k(ℝ)` for any finite `k`** — open.
+
+Complex-side restatement of `sin_not_in_eml`: the embedding
+`x ↦ sin(Re x)` does not lie in any finite-depth EML grammar
+inside `ℂ → ℂ`. Moved from `EMLDepth.lean` to avoid a circular
+import.
+
+### Proof strategy
+
+1. **Finite zeros (induction on depth).** Every depth-`k` real
+   ceml tree has finitely many zeros on any bounded interval —
+   the depth-1 base case is `depth1_finite_zeros_real` (proved
+   here), and the inductive step needs Khovanskii on the
+   Pfaffian chain assembled from the AST.
+2. **Infinite zeros for sin.** `Real.sin (n * Real.pi) = 0`
+   gives infinitely many zeros (proved here as
+   `sin_has_infinitely_many_zeros`).
+3. **Contradiction** between (1) and (2) when `t = sin`.
+
+### Mathlib infrastructure needed
+
+Same as `sin_not_in_eml`: the Khovanskii zero-count theorem or
+the o-minimality of `ℝ_exp`. Both reduce a tedious inductive
+zero-count argument to a one-line consequence of an existing
+meta-theorem. -/
 theorem sin_not_in_real_EML_k (k : ℕ) :
     (fun x : ℂ => ↑(Real.sin x.re) : ℂ → ℂ) ∉ EML_k k := by
-  sorry  -- Full proof strategy:
-         -- 1. Every depth-k real ceml tree has finitely many zeros in any bounded interval
-         --    (depth1_finite_zeros_real + induction)
-         -- 2. sin(nπ) = 0 for all n ∈ ℤ — infinitely many zeros
-         -- 3. Contradiction
+  sorry  -- Open: needs Khovanskii zero-count for the inductive step
+         -- on EML tree depth. See docstring for the proof strategy.
 
 -- ===================================================================
 -- Verified: sin(x) has zeros at all integer multiples of π

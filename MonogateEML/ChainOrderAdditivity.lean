@@ -1,6 +1,7 @@
 -- MonogateEML/ChainOrderAdditivity.lean
 import Mathlib.Data.Real.Basic
 import Mathlib.Data.Multiset.Basic
+import Mathlib.Algebra.BigOperators.Group.Multiset
 
 /-!
 # Chain-Order Additivity (CHA)
@@ -123,21 +124,45 @@ For any symbolic expression `f`, the Pfaffian chain order of `f`
 equals the sum (with multiplicity) of chain orders of its
 PNE-primitive AST occurrences.
 
-  Empirical support: 22/23 hits across two probe sets
-  (yn-log-singularity-2026-04-27 + 9th-tower-prediction-2026-04-27).
+### Mathematical content
 
-  The single Δ=+3 outlier `J₀ + Y₀` is recovered under the rule
-  once Y₀'s internal J₀ occurrence is counted; see the paper draft
-  `paper/drafts/unified_dynamics_counter_2026_04_27.md` Section 4.
+Chain order of a Pfaffian function is the length of its defining
+Pfaffian chain. CHA states that this length is recoverable by a
+purely syntactic walk of the AST: count each occurrence of a
+non-elementary primitive with the chain order of its defining
+ODE, sum the multiset.
 
-  This proof requires the Khovanskii zero-count theorem on Pfaffian
-  chains, which is not yet in Mathlib. -/
+### Why it matters
+
+If proven, CHA gives a linear-time algorithm for the Pfaffian
+chain order from the AST — currently the best known method
+requires solving the chain ODEs symbolically. CHA also sharpens
+Khovanskii's zero-count bound from a global statement about a
+Pfaffian function to a constructive bound from the AST shape.
+
+### Empirical support
+
+22/23 hits across `exploration/yn-log-singularity-2026-04-27`
+and `exploration/9th-tower-prediction-2026-04-27`. The single
+`Δ = +3` outlier `J₀ + Y₀` is recovered once `Y₀`'s internal
+`J₀` occurrence is counted; see paper Section 4.
+
+### Mathlib infrastructure needed
+
+* The Khovanskii zero-count theorem on Pfaffian chains
+  (`Mathlib.Analysis.PfaffianChains`, not yet in Mathlib).
+* o-minimal structure theory for `ℝ_exp`, `ℝ_an`, `ℝ_an,exp`
+  (Wilkie 1996; not yet in Mathlib — see Mathlib issue tracker
+  for o-minimal RFC).
+* Composition lemmas for Pfaffian functions analogous to
+  `AnalyticOnNhd.comp`. -/
 theorem chain_order_additivity (f : SymbolicExpr) :
     chainOrder f =
       ((PNE_primitives_in_AST f).map PNEPrimitive.chainOrder).sum := by
-  sorry
+  sorry  -- Open: requires Khovanskii zero-count + o-minimal Pfaffian
+         -- composition. See docstring for empirical motivation.
 
-/-- **Corollary 1: tower-base equals chain order.**
+/-- **Corollary 1: tower-base equals chain order — open.**
 
 For any single-primitive expression `f` whose AST contains exactly
 one PNE-primitive node `p`, the empirical "tower base" assigned in
@@ -145,33 +170,68 @@ the C-207 dataset equals the chain order of `p`'s defining ODE.
 
   Empirical support: 17/18 of PNE rows in `combined_dataset.csv`.
   The lone Y_n outlier is recovered via `chain_order_additivity`
-  once Y_n is recognised as a hidden T_J ⊕ T_Γ AST occurrence. -/
+  once Y_n is recognised as a hidden T_J ⊕ T_Γ AST occurrence.
+
+### Why this is sorry'd
+
+This corollary is a direct consequence of `chain_order_additivity`
+specialized to the single-primitive case: rewriting the multiset
+sum on a singleton reduces to the chain order of the primitive.
+But `chain_order_additivity` itself is sorry'd (open conjecture,
+needs Khovanskii / o-minimal infrastructure).
+
+A theorem downstream of a sorry is not proved. Marking this
+corollary as sorry too keeps the dependency honest — once CHA is
+closed, this corollary collapses to the original two-line proof
+(`rw [chain_order_additivity, hf]; simp [Multiset.map_singleton,
+Multiset.sum_singleton]`). -/
 theorem tower_base_eq_chain_order
     (f : SymbolicExpr) (p : PNEPrimitive)
     (hf : PNE_primitives_in_AST f = {p}) :
     chainOrder f = PNEPrimitive.chainOrder p := by
-  rw [chain_order_additivity, hf]
-  simp [Multiset.map_singleton, Multiset.sum_singleton]
+  sorry  -- Conditionally provable from chain_order_additivity (sorry).
+         -- See docstring for the two-line proof that closes once CHA does.
 
-/-- **Corollary 2: minimum generating set in the abstract.**
+/-- **Corollary 2: minimum generating set in the abstract — open.**
 
-Under unrestricted parameter substitution (DLMF identities), the
-following holds: T_erf, T_Si, T_J, T_Ai, T_K all reduce to
-restricted parameter values of the hypergeometric supertower T_F.
-T_Γ and T_W are NOT reducible to any other tower. Hence
+Under unrestricted parameter substitution (DLMF identities),
+`T_erf`, `T_Si`, `T_J`, `T_Ai`, `T_K` all reduce to restricted
+parameter values of the hypergeometric supertower `T_F`.
+`T_Γ` and `T_W` are NOT reducible to any other tower. Hence
 `{T_F, T_Γ, T_W}` is a minimum generating set for the
-Pfaffian-not-elementary closure (in the abstract sense; in the F16
-EML grammar all 8 are operationally needed since the grammar lacks
-parameter-substitution primitives).
+Pfaffian-not-elementary closure (in the abstract sense; in the
+F16 EML grammar all 8 are operationally needed since the grammar
+lacks parameter-substitution primitives).
 
-  Empirical support:
-  `exploration/tower-independence-2026-04-27/pairwise_results.json`
-  reports 5 SUBSUMES + 1 PARTIAL + 22 INDEPENDENT pairs. -/
+### Why it matters
+
+The abstract minimum generating set tells us how *fundamental*
+each Pfaffian primitive is. If only three primitives generate
+the rest, an EML compiler can target a smaller backend ISA;
+if more, every additional tower needs its own runtime.
+
+### Empirical support
+
+`exploration/tower-independence-2026-04-27/pairwise_results.json`
+reports 5 SUBSUMES + 1 PARTIAL + 22 INDEPENDENT pairs across all
+${8 \choose 2} = 28$ unordered tower pairs.
+
+### Mathlib infrastructure needed
+
+* A formal model of the hypergeometric function `_pFq` with
+  parameter substitution and DLMF identity rewrites. Mathlib
+  has `Real.Gamma`, `Real.Beta`, and the basic `_2F_1`, but the
+  parametric DLMF rewrites are not yet in scope.
+* The current statement is a placeholder (`∃ params, True`)
+  pending a proper definition of "tower reducibility under
+  parameter substitution". The right type is something like
+  `∃ subst : ℝ → ℝ, AnalyticOn ℝ subst univ ∧ p = T_F.specialize subst`. -/
 theorem three_tower_min_generating_set :
     ∀ p : PNEPrimitive,
       (p = .T_erf ∨ p = .T_Si ∨ p = .T_J ∨ p = .T_Ai ∨ p = .T_K) →
-        ∃ params : ℕ, True  -- placeholder; would assert reducibility to T_F
+        ∃ params : ℕ, True  -- placeholder; replace with reducibility to T_F
         := by
-  sorry
+  sorry  -- Open: needs formal _pFq + DLMF parameter-substitution
+         -- machinery. See docstring for the proper statement shape.
 
 end MonogateChainOrderAdditivity

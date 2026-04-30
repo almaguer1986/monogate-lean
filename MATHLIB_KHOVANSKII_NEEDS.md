@@ -69,13 +69,14 @@ The chain-order-1 case alone (`r = 1`) is sufficient to close
 `sin_not_in_eml` for the depth-1 fragment, and would already be a
 publishable Mathlib contribution.
 
-## Closing the four sorries from the gap
+## Closing the five sorries from the gap
 
 | Theorem | What the gap unlocks |
 |---|---|
 | `sin_not_in_eml` | Each candidate EML tree of bounded depth is a Pfaffian function; bound on its zero count contradicts `sin_int_pi_zero` for the integer multiples `nπ` in any interval. |
 | `sin_not_in_real_EML_k` | Same argument lifted to the complex-coerced statement; otherwise structurally identical. |
 | `chain_order_additivity` | The chain order is preserved under sum / product of Pfaffian chains; combined with the AST-occurrence multiset definition this gives the additivity equation. Empirical: 22/23 hits. |
+| `tower_base_eq_chain_order` | Direct corollary of `chain_order_additivity` specialized to a singleton AST; the two-line `rw + simp` proof is preserved in the source comment for the day CHA closes. |
 | `three_tower_min_generating_set` | Needs **both** the Pfaffian-chain machinery AND a predicate for "reducible to T_F under DLMF parameter substitution" — see below. |
 
 ## Open: placeholder rewrite
